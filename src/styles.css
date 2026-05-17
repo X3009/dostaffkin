@@ -45,19 +45,19 @@ body {
   transition:
     transform 0.08s ease,
     opacity 0.12s ease;
-  background: #ffcc00;
+  background: #70a068;
   color: #111111;
   text-align: center;
   text-decoration: none;
 }
 
 .button:hover {
-  background-color: #e5bc19;
+  background-color: #598a52;
 }
 
 .button:disabled {
   cursor: not-allowed;
-  background-color: #fade6e;
+  background-color: #b0d8a8;
   color: #787878;
   transform: none;
 }
