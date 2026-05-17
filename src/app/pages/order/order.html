@@ -15,24 +15,14 @@
       <div class="main-fields">
         <div class="main-field" id="fromField">
           <div class="main-pin"></div>
-          <input
-            id="from"
-            formControlName="from"
-            placeholder="Откуда: начните вводить адрес"
-            autocomplete="off"
-          />
-          <div class="main-ac" id="fromAc" role="listbox" aria-label="Подсказки адресов"></div>
+          <div id="fromAutocompleteHost" class="main-google-ac"></div>
+          <input type="hidden" formControlName="from" />
         </div>
 
         <div class="main-field" id="toField">
           <div class="main-pin"></div>
-          <input
-            id="to"
-            formControlName="to"
-            placeholder="Куда: начните вводить адрес"
-            autocomplete="off"
-          />
-          <div class="main-ac" id="toAc" role="listbox" aria-label="Подсказки адресов"></div>
+          <div id="toAutocompleteHost" class="main-google-ac"></div>
+          <input type="hidden" formControlName="to" />
         </div>
       </div>
     </div>
