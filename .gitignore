@@ -1,0 +1,8 @@
+__notes
+node_modules
+dist/
+tmp/
+out-tsc/
+bazel-out/
+.angular/
+.cache/
