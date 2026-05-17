@@ -2,7 +2,8 @@
   "$schema": "./node_modules/@angular/cli/lib/config/schema.json",
   "version": 1,
   "cli": {
-    "packageManager": "npm"
+    "packageManager": "npm",
+    "analytics": false
   },
   "newProjectRoot": "projects",
   "projects": {
@@ -18,7 +19,7 @@
           "options": {
             "browser": "src/main.ts",
             "tsConfig": "tsconfig.app.json",
-            "outputPath": {"base": "docs","browser": ""},
+            "outputPath": { "base": "docs", "browser": "" },
             "baseHref": "/dostaffkin/",
             "assets": [
               {
@@ -26,9 +27,7 @@
                 "input": "public"
               }
             ],
-            "styles": [
-              "src/styles.css"
-            ]
+            "styles": ["src/styles.css"]
           },
           "configurations": {
             "production": {
@@ -44,6 +43,9 @@
         },
         "serve": {
           "builder": "@angular/build:dev-server",
+          "options": {
+            "allowedHosts": ["dostaffkin.29081997.xyz"]
+          },
           "configurations": {
             "production": {
               "buildTarget": "dostaffkin:build:production"
