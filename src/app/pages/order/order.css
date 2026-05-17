@@ -88,8 +88,8 @@
 }
 
 .main-size-card.is-active {
-  background-color: #f8f2d6;
-  border-color: #b7b196;
+  background-color: #b0d8a8;
+  border-color: #70a068;
 }
 
 .main-size-top {
@@ -280,8 +280,8 @@
 }
 
 .main-speed-card.is-active {
-  background-color: #f8f2d6;
-  border-color: #b7b196;
+  background-color: #b0d8a8;
+  border-color: #70a068;
 }
 
 .main-speed-description {
@@ -289,7 +289,6 @@
   color: #7c7c7c;
   line-height: 1.2;
 }
-
 
 @media (max-width: 767px) {
   .main {
