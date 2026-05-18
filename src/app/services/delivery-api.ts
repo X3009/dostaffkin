@@ -13,4 +13,12 @@ export class DeliveryApi {
       .post<any>(`https://testologia.ru/delivery/create`, payload)
       .pipe(catchError((err) => of({ error: err?.error?.error ?? 'Ошибка при создании заявки' })));
   }
+
+  getDeliveryInfo(id: number): Observable<any> {
+    return this.http
+      .get<any>(`https://testologia.ru/delivery/info`, { params: { id } })
+      .pipe(
+        catchError((err) => of({ error: err?.error?.error ?? 'Ошибка при получении статуса' }))
+      );
+  }
 }
