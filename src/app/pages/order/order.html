@@ -13,7 +13,14 @@
       <div class="main-block-title">Маршрут</div>
 
       <div class="main-fields">
-        <div class="main-field" id="fromField">
+        <div
+          class="main-field"
+          id="fromField"
+          [class.is-invalid]="
+            this.routeForm.get('from')?.invalid &&
+            (this.routeForm.get('from')?.dirty || this.routeForm.get('from')?.touched)
+          "
+        >
           <div class="main-pin"></div>
           <div id="fromAutocompleteHost" class="main-google-ac"></div>
           <input type="hidden" formControlName="from" />
@@ -23,7 +30,14 @@
         <label for="from" class="input-error">Заполните поле Откуда</label>
         }
 
-        <div class="main-field" id="toField">
+        <div
+          class="main-field"
+          id="toField"
+          [class.is-invalid]="
+            this.routeForm.get('to')?.invalid &&
+            (this.routeForm.get('to')?.dirty || this.routeForm.get('to')?.touched)
+          "
+        >
           <div class="main-pin"></div>
           <div id="toAutocompleteHost" class="main-google-ac"></div>
           <input type="hidden" formControlName="to" />

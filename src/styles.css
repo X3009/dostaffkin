@@ -29,6 +29,11 @@ body {
   font-family: 'Roboto', sans-serif;
 }
 
+:root {
+  --field-invalid-border: #dc2626;
+  --field-invalid-shadow: 0 0 0 4px rgba(220, 38, 38, 0.16);
+}
+
 body {
   background: #fdfdfd;
 }
@@ -143,8 +148,10 @@ textarea::placeholder {
   background: rgba(255, 255, 255, 0.75);
 }
 
-.main-field:has(.ng-invalid.ng-touched) {
-  border-color: red;
+.main-field:has(.ng-invalid.ng-touched),
+.main-field.is-invalid {
+  border-color: var(--field-invalid-border);
+  box-shadow: var(--field-invalid-shadow);
 }
 
 .input-error {
@@ -152,5 +159,5 @@ textarea::placeholder {
   display: block;
   margin-bottom: 10px;
   font-size: 12px;
-  color: red;
+  color: var(--field-invalid-border);
 }

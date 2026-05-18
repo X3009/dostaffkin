@@ -41,6 +41,8 @@ export class Order implements AfterViewInit, OnDestroy {
   private toAutocompleteElement: any = null;
   private fromSelectHandler: ((event: any) => void | Promise<void>) | null = null;
   private toSelectHandler: ((event: any) => void | Promise<void>) | null = null;
+  private fromBlurHandler: (() => void) | null = null;
+  private toBlurHandler: (() => void) | null = null;
 
   private readonly mapCenter = { lat: 55.751244, lng: 37.618423 };
   private readonly mapApiKey: string;
@@ -263,8 +265,18 @@ export class Order implements AfterViewInit, OnDestroy {
       await this.applySelectedPlace(event, 'to');
     };
 
+    this.fromBlurHandler = () => {
+      this.routeForm.controls['from'].markAsTouched();
+    };
+
+    this.toBlurHandler = () => {
+      this.routeForm.controls['to'].markAsTouched();
+    };
+
     this.fromAutocompleteElement.addEventListener('gmp-select', this.fromSelectHandler);
     this.toAutocompleteElement.addEventListener('gmp-select', this.toSelectHandler);
+    this.fromAutocompleteElement.addEventListener('blur', this.fromBlurHandler);
+    this.toAutocompleteElement.addEventListener('blur', this.toBlurHandler);
   }
 
   private async applySelectedPlace(event: any, field: RouteField): Promise<void> {
@@ -284,6 +296,7 @@ export class Order implements AfterViewInit, OnDestroy {
     }
 
     this.routeForm.controls[field].setValue(label);
+    this.routeForm.controls[field].markAsTouched();
   }
 
   private renderRoute(route: any): void {
@@ -315,13 +328,21 @@ export class Order implements AfterViewInit, OnDestroy {
     if (this.fromAutocompleteElement && this.fromSelectHandler) {
       this.fromAutocompleteElement.removeEventListener('gmp-select', this.fromSelectHandler);
     }
+    if (this.fromAutocompleteElement && this.fromBlurHandler) {
+      this.fromAutocompleteElement.removeEventListener('blur', this.fromBlurHandler);
+    }
 
     if (this.toAutocompleteElement && this.toSelectHandler) {
       this.toAutocompleteElement.removeEventListener('gmp-select', this.toSelectHandler);
     }
+    if (this.toAutocompleteElement && this.toBlurHandler) {
+      this.toAutocompleteElement.removeEventListener('blur', this.toBlurHandler);
+    }
 
     this.fromSelectHandler = null;
     this.toSelectHandler = null;
+    this.fromBlurHandler = null;
+    this.toBlurHandler = null;
     this.fromAutocompleteElement = null;
     this.toAutocompleteElement = null;
   }

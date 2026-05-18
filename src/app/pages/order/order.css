@@ -79,6 +79,10 @@
   z-index: 20;
 }
 
+.main-route .main-field.is-invalid {
+  z-index: 20;
+}
+
 .main-sizes {
   display: grid;
   gap: 6px;
