@@ -1,6 +1,7 @@
 import { UpperCasePipe } from '@angular/common';
 import { AfterViewInit, Component, OnDestroy, signal } from '@angular/core';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
+import { finalize } from 'rxjs';
 import { environment } from '../../../environments/environment';
 import { Header } from '../../header/header';
 import { DeliveryApi } from '../../services/delivery-api';
@@ -31,6 +32,7 @@ export class Order implements AfterViewInit, OnDestroy {
 
   public orderId: any = signal(null);
   public calculationResult: any = signal(null);
+  public sidebarLoading = signal(false);
 
   private map: any = null;
   private routeClass: any = null;
@@ -104,6 +106,8 @@ export class Order implements AfterViewInit, OnDestroy {
     this.calculationResult.set(null);
 
     if (this.routeForm.invalid) {
+      this.routeForm.controls['from'].markAsTouched();
+      this.routeForm.controls['to'].markAsTouched();
       return;
     }
 
@@ -113,6 +117,7 @@ export class Order implements AfterViewInit, OnDestroy {
     }
 
     const { from, to, size, speed } = this.routeForm.getRawValue();
+    this.sidebarLoading.set(true);
 
     try {
       const request = {
@@ -147,6 +152,8 @@ export class Order implements AfterViewInit, OnDestroy {
       this.applyCalculation({ from, to, size, speed, distanceMeters });
     } catch {
       this.failedCalculation();
+    } finally {
+      this.sidebarLoading.set(false);
     }
   }
 
@@ -173,14 +180,18 @@ export class Order implements AfterViewInit, OnDestroy {
       createdAt: new Date().toISOString(),
     };
 
-    this.deliveryApi.createDelivery(payload).subscribe((response) => {
-      if ('error' in response) {
-        alert(response.error);
-        return;
-      }
+    this.sidebarLoading.set(true);
+    this.deliveryApi
+      .createDelivery(payload)
+      .pipe(finalize(() => this.sidebarLoading.set(false)))
+      .subscribe((response) => {
+        if ('error' in response) {
+          alert(response.error);
+          return;
+        }
 
-      this.orderId.set(response.id);
-    });
+        this.orderId.set(response.id);
+      });
   }
 
   private async initMapAndLibraries(): Promise<void> {

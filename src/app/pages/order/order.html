@@ -97,7 +97,7 @@
         id="calc"
         class="button calculate-button"
         type="button"
-        [disabled]="routeForm.invalid"
+        [disabled]="routeForm.invalid || sidebarLoading()"
         (click)="calculate()"
       >
         Рассчитать
@@ -202,7 +202,7 @@
           id="submit"
           class="button main-submit-request"
           type="button"
-          [disabled]="!calculationResult() || orderForm.invalid"
+          [disabled]="!calculationResult() || orderForm.invalid || sidebarLoading()"
           (click)="submitOrder()"
         >
           Отправить заявку
@@ -219,4 +219,10 @@
       </div>
     </div>
   </div>
+
+  @if (sidebarLoading()) {
+  <div class="sidebar-loader-overlay" role="status" aria-live="polite" aria-label="Загрузка">
+    <div class="sidebar-loader"></div>
+  </div>
+  }
 </aside>
