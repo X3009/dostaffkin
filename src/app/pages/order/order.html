@@ -9,7 +9,7 @@
   </div>
 
   <div class="main-content">
-    <div class="main-route" [formGroup]="routeForm">
+    <div class="main-route" [formGroup]="routeForm" [class.is-locked]="orderId()">
       <div class="main-block-title">Маршрут</div>
 
       <div class="main-fields">
@@ -49,7 +49,7 @@
       </div>
     </div>
 
-    <div class="main-package" [style.display]="orderId() ? 'none' : 'null'">
+    <div class="main-package" [style.display]="orderId() ? 'none' : null">
       <div class="main-block-title">Размер посылки</div>
 
       <div class="main-sizes">
@@ -75,7 +75,7 @@
       </div>
     </div>
 
-    <div class="main-speed" [style.display]="orderId() ? 'none' : 'null'">
+    <div class="main-speed" [style.display]="orderId() ? 'none' : null">
       <div class="main-block-title">Скорость доставки</div>
 
       <div class="main-speeds">
@@ -92,7 +92,7 @@
       </div>
     </div>
 
-    <div class="main-calculate-block" [style.display]="orderId() ? 'none' : 'null'">
+    <div class="main-calculate-block" [style.display]="orderId() ? 'none' : null">
       <button
         id="calc"
         class="button calculate-button"
@@ -144,7 +144,7 @@
         class="main-order-form"
         id="orderForm"
         [formGroup]="orderForm"
-        [style.display]="orderId() ? 'none' : 'null'"
+        [style.display]="orderId() ? 'none' : null"
       >
         <div class="main-order-title">Оформление доставки</div>
 
@@ -216,6 +216,9 @@
           Номер отправления – <span id="orderId">{{orderId()}}</span>
         </div>
         <div class="main-success-subtitle">Мы скоро свяжемся с вами</div>
+        <button type="button" class="button main-success-reset" (click)="resetOrderFlow()">
+          Оформить новую заявку
+        </button>
       </div>
     </div>
   </div>

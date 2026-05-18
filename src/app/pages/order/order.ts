@@ -194,6 +194,32 @@ export class Order implements AfterViewInit, OnDestroy {
       });
   }
 
+  public resetOrderFlow(): void {
+    this.orderId.set(null);
+    this.calculationResult.set(null);
+    this.sidebarLoading.set(false);
+
+    this.routeForm.reset({
+      from: '',
+      to: '',
+      size: 'xs',
+      speed: 'regular',
+    });
+
+    this.orderForm.reset({
+      name: '',
+      phone: '',
+      comment: '',
+    });
+
+    this.clearRouteGraphics();
+
+    if (this.placesReady) {
+      this.detachAutocompleteListeners();
+      this.initPlaceAutocomplete();
+    }
+  }
+
   private async initMapAndLibraries(): Promise<void> {
     const googleMaps = window.google?.maps;
     if (!googleMaps?.importLibrary) {
