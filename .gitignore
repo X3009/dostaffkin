@@ -6,4 +6,3 @@ out-tsc/
 bazel-out/
 .angular/
 .cache/
-src/environments/environment.ts
