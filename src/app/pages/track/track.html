@@ -18,6 +18,7 @@
           id="trackButton"
           class="button track-button"
           type="button"
+          [disabled]="trackLoading()"
           (click)="trackShipment()"
         >
           Отследить
@@ -25,7 +26,17 @@
       </div>
     </section>
 
-    <section class="track-card track-result" id="trackResult" [class.is-visible]="trackResult()">
+    <section
+      class="track-card track-result"
+      id="trackResult"
+      [class.is-visible]="trackResultVisible()"
+    >
+      @if (trackLoading()) {
+      <div class="track-loader-overlay" role="status" aria-live="polite" aria-label="Загрузка">
+        <div class="track-loader"></div>
+      </div>
+      }
+
       <div class="track-result-header">
         <div class="track-id" id="trackIdValue"></div>
 

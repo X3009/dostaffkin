@@ -43,10 +43,43 @@
 .track-result {
   margin-top: 5px;
   display: none;
+  position: relative;
+  overflow: hidden;
 }
 
 .track-result.is-visible {
   display: block;
+}
+
+.track-loader-overlay {
+  position: absolute;
+  inset: 0;
+  z-index: 20;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255, 255, 255, 0.72);
+  backdrop-filter: blur(2px);
+}
+
+.track-loader {
+  width: 46px;
+  height: 46px;
+  border-radius: 999px;
+  border: 4px solid #b0d8a8;
+  border-top-color: #598a52;
+  border-right-color: #70a068;
+  box-shadow: 0 0 0 5px rgba(112, 160, 104, 0.12);
+  animation: track-loader-spin 0.9s linear infinite;
+}
+
+@keyframes track-loader-spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
 }
 
 .track-result-header {
