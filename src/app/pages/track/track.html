@@ -5,11 +5,12 @@
     <section class="track-card track-search">
       <div class="track-title">Отследить посылку</div>
 
-      <div class="track-action">
+      <form class="track-action" (ngSubmit)="trackShipment()">
         <div class="main-field track-field">
           <input
             id="trackNumber"
             [(ngModel)]="trackNumber"
+            name="trackNumber"
             placeholder="Введите номер посылки"
             autocomplete="off"
           />
@@ -17,13 +18,12 @@
         <button
           id="trackButton"
           class="button track-button"
-          type="button"
+          type="submit"
           [disabled]="trackLoading()"
-          (click)="trackShipment()"
         >
           Отследить
         </button>
-      </div>
+      </form>
     </section>
 
     <section
