@@ -6,20 +6,27 @@
       <div class="track-title">Отследить посылку</div>
 
       <form class="track-action" (ngSubmit)="trackShipment()">
-        <div class="main-field track-field">
+        <div class="main-field track-field" [class.is-invalid]="isTrackFieldInvalid()">
           <input
             id="trackNumber"
             [(ngModel)]="trackNumber"
             name="trackNumber"
             placeholder="Введите номер посылки"
             autocomplete="off"
+            inputmode="numeric"
+            (blur)="onTrackNumberBlur()"
           />
         </div>
+        @if (isTrackNumberEmptyErrorVisible()) {
+        <label for="trackNumber" class="input-error">Заполните номер отправления</label>
+        } @else if (isTrackNumberFormatErrorVisible()) {
+        <label for="trackNumber" class="input-error">Введите корректный номер отправления</label>
+        }
         <button
           id="trackButton"
           class="button track-button"
           type="submit"
-          [disabled]="trackLoading()"
+          [disabled]="trackLoading() || !isTrackNumberValid()"
         >
           Отследить
         </button>

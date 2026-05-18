@@ -40,6 +40,10 @@
   margin-bottom: 10px;
 }
 
+.track-action .input-error {
+  margin-bottom: 10px;
+}
+
 .track-result {
   margin-top: 5px;
   display: none;

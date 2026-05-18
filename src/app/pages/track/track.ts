@@ -15,26 +15,55 @@ export class Track {
   trackResult: any = signal(null);
   trackLoading = signal(false);
   trackResultVisible = signal(false);
+  trackNumberTouched = false;
   private lastSuccessfulTrackNumber: number | null = null;
 
   constructor(private deliveryApi: DeliveryApi) {}
 
+  isTrackNumberValid(): boolean {
+    const rawValue = this.trackNumber.trim();
+    if (!rawValue) {
+      return false;
+    }
+
+    if (!/^\d+$/.test(rawValue)) {
+      return false;
+    }
+
+    return Number(rawValue) > 0;
+  }
+
+  isTrackNumberEmptyErrorVisible(): boolean {
+    return this.trackNumberTouched && this.trackNumber.trim().length === 0;
+  }
+
+  isTrackNumberFormatErrorVisible(): boolean {
+    const rawValue = this.trackNumber.trim();
+    if (!this.trackNumberTouched || rawValue.length === 0) {
+      return false;
+    }
+
+    return !this.isTrackNumberValid();
+  }
+
+  isTrackFieldInvalid(): boolean {
+    return this.isTrackNumberEmptyErrorVisible() || this.isTrackNumberFormatErrorVisible();
+  }
+
+  onTrackNumberBlur(): void {
+    this.trackNumberTouched = true;
+  }
+
   trackShipment(): void {
+    this.trackNumberTouched = true;
     const rawValue = this.trackNumber.trim();
 
-    if (!rawValue) {
-      alert('Заполните номер отправления');
+    if (!this.isTrackNumberValid()) {
       this.trackResultVisible.set(false);
       return;
     }
 
     const numericValue = Number(rawValue);
-    if (Number.isNaN(numericValue) || numericValue <= 0) {
-      alert('Введите корректный номер отправления');
-      this.trackResultVisible.set(false);
-      return;
-    }
-
     const isSameAsLastSuccessful = this.lastSuccessfulTrackNumber === numericValue;
 
     this.trackResultVisible.set(true);
