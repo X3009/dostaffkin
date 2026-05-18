@@ -1,3 +1,0 @@
-window.__env = {
-  GOOGLE_MAPS_API_KEY: 'PUT_YOUR_GOOGLE_MAPS_API_KEY_HERE'
-};
