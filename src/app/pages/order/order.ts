@@ -3,6 +3,7 @@ import { AfterViewInit, Component, OnDestroy, signal } from '@angular/core';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { environment } from '../../../environments/environment';
 import { Header } from '../../header/header';
+import { DeliveryApi } from '../../services/delivery-api';
 import { DELIVERY_SIZES, DELIVERY_SPEEDS } from './order.config';
 type RouteField = 'from' | 'to';
 
@@ -44,7 +45,10 @@ export class Order implements AfterViewInit, OnDestroy {
   private readonly mapCenter = { lat: 55.751244, lng: 37.618423 };
   private readonly mapApiKey: string;
 
-  constructor(private formBuilder: FormBuilder) {
+  constructor(
+    private formBuilder: FormBuilder,
+    private deliveryApi: DeliveryApi
+  ) {
     this.routeForm = this.formBuilder.group({
       from: ['', Validators.required],
       to: ['', Validators.required],
@@ -167,8 +171,14 @@ export class Order implements AfterViewInit, OnDestroy {
       createdAt: new Date().toISOString(),
     };
 
-    console.log(payload);
-    this.orderId.set(1);
+    this.deliveryApi.createDelivery(payload).subscribe((response) => {
+      if ('error' in response) {
+        alert(response.error);
+        return;
+      }
+
+      this.orderId.set(response.id);
+    });
   }
 
   private async initMapAndLibraries(): Promise<void> {
