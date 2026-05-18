@@ -1,6 +1,8 @@
 import { Component, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
+import { finalize } from 'rxjs';
 import { Header } from '../../header/header';
+import { DeliveryApi } from '../../services/delivery-api';
 
 @Component({
   selector: 'app-track',
@@ -11,36 +13,84 @@ import { Header } from '../../header/header';
 export class Track {
   trackNumber = '';
   trackResult: any = signal(null);
+  trackLoading = signal(false);
+  trackResultVisible = signal(false);
+  trackNumberTouched = false;
+  private lastSuccessfulTrackNumber: number | null = null;
+
+  constructor(private deliveryApi: DeliveryApi) {}
+
+  isTrackNumberValid(): boolean {
+    const rawValue = this.trackNumber.trim();
+    if (!rawValue) {
+      return false;
+    }
+
+    if (!/^\d+$/.test(rawValue)) {
+      return false;
+    }
+
+    return Number(rawValue) > 0;
+  }
+
+  isTrackNumberEmptyErrorVisible(): boolean {
+    return this.trackNumberTouched && this.trackNumber.trim().length === 0;
+  }
+
+  isTrackNumberFormatErrorVisible(): boolean {
+    const rawValue = this.trackNumber.trim();
+    if (!this.trackNumberTouched || rawValue.length === 0) {
+      return false;
+    }
+
+    return !this.isTrackNumberValid();
+  }
+
+  isTrackFieldInvalid(): boolean {
+    return this.isTrackNumberEmptyErrorVisible() || this.isTrackNumberFormatErrorVisible();
+  }
+
+  onTrackNumberBlur(): void {
+    this.trackNumberTouched = true;
+  }
 
   trackShipment(): void {
+    this.trackNumberTouched = true;
     const rawValue = this.trackNumber.trim();
 
-    if (!rawValue) {
-      alert('Заполните номер отправления');
+    if (!this.isTrackNumberValid()) {
+      this.trackResultVisible.set(false);
       return;
     }
 
-    this.trackResult.set(null);
     const numericValue = Number(rawValue);
-    if (Number.isNaN(numericValue) || numericValue <= 0) {
-      alert('Введите корректный номер отправления');
-      return;
-    }
+    const isSameAsLastSuccessful = this.lastSuccessfulTrackNumber === numericValue;
 
-    this.trackResult.set({
-      id: 1,
-      route: {
-        from: 'Москва, улица Арбат, 1',
-        to: 'Минск, проспект Независимости, 58',
-      },
-      statuses: [
-        { type: 'created', label: 'Создан', date: '10.01.2026' },
-        { type: 'in-way', label: 'В пути: Вязьма', date: '15.01.2026' },
-        { type: 'in-way', label: 'В пути: Орша', date: '16.01.2026' },
-        { type: 'in-way', label: 'В пути: Минск', date: '18.01.2026' },
-        { type: 'ready', label: 'Готов к выдаче', date: '25.01.2026' },
-        { type: 'done', label: 'Вручен', date: '27.01.2026' },
-      ],
-    });
+    this.trackResultVisible.set(true);
+    if (!isSameAsLastSuccessful) {
+      this.trackResult.set(null);
+    }
+    this.trackLoading.set(true);
+
+    this.deliveryApi
+      .getDeliveryInfo(numericValue)
+      .pipe(finalize(() => this.trackLoading.set(false)))
+      .subscribe((response) => {
+        if ('error' in response) {
+          alert(response.error);
+          const hasPreviousResult = this.trackResult() !== null;
+          if (isSameAsLastSuccessful && hasPreviousResult) {
+            this.trackResultVisible.set(true);
+            return;
+          }
+
+          this.trackResult.set(null);
+          this.trackResultVisible.set(false);
+          return;
+        }
+
+        this.trackResult.set(response);
+        this.lastSuccessfulTrackNumber = numericValue;
+      });
   }
 }

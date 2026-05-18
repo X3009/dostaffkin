@@ -5,27 +5,45 @@
     <section class="track-card track-search">
       <div class="track-title">Отследить посылку</div>
 
-      <div class="track-action">
-        <div class="main-field track-field">
+      <form class="track-action" (ngSubmit)="trackShipment()">
+        <div class="main-field track-field" [class.is-invalid]="isTrackFieldInvalid()">
           <input
             id="trackNumber"
             [(ngModel)]="trackNumber"
+            name="trackNumber"
             placeholder="Введите номер посылки"
             autocomplete="off"
+            inputmode="numeric"
+            (blur)="onTrackNumberBlur()"
           />
         </div>
+        @if (isTrackNumberEmptyErrorVisible()) {
+        <label for="trackNumber" class="input-error">Заполните номер отправления</label>
+        } @else if (isTrackNumberFormatErrorVisible()) {
+        <label for="trackNumber" class="input-error">Введите корректный номер отправления</label>
+        }
         <button
           id="trackButton"
           class="button track-button"
-          type="button"
-          (click)="trackShipment()"
+          type="submit"
+          [disabled]="trackLoading() || !isTrackNumberValid()"
         >
           Отследить
         </button>
-      </div>
+      </form>
     </section>
 
-    <section class="track-card track-result" id="trackResult" [class.is-visible]="trackResult()">
+    <section
+      class="track-card track-result"
+      id="trackResult"
+      [class.is-visible]="trackResultVisible()"
+    >
+      @if (trackLoading()) {
+      <div class="track-loader-overlay" role="status" aria-live="polite" aria-label="Загрузка">
+        <div class="track-loader"></div>
+      </div>
+      }
+
       <div class="track-result-header">
         <div class="track-id" id="trackIdValue"></div>
 

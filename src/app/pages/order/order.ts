@@ -1,8 +1,10 @@
 import { UpperCasePipe } from '@angular/common';
 import { AfterViewInit, Component, OnDestroy, signal } from '@angular/core';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
+import { finalize } from 'rxjs';
 import { environment } from '../../../environments/environment';
 import { Header } from '../../header/header';
+import { DeliveryApi } from '../../services/delivery-api';
 import { DELIVERY_SIZES, DELIVERY_SPEEDS } from './order.config';
 type RouteField = 'from' | 'to';
 
@@ -30,6 +32,7 @@ export class Order implements AfterViewInit, OnDestroy {
 
   public orderId: any = signal(null);
   public calculationResult: any = signal(null);
+  public sidebarLoading = signal(false);
 
   private map: any = null;
   private routeClass: any = null;
@@ -40,11 +43,16 @@ export class Order implements AfterViewInit, OnDestroy {
   private toAutocompleteElement: any = null;
   private fromSelectHandler: ((event: any) => void | Promise<void>) | null = null;
   private toSelectHandler: ((event: any) => void | Promise<void>) | null = null;
+  private fromBlurHandler: (() => void) | null = null;
+  private toBlurHandler: (() => void) | null = null;
 
   private readonly mapCenter = { lat: 55.751244, lng: 37.618423 };
   private readonly mapApiKey: string;
 
-  constructor(private formBuilder: FormBuilder) {
+  constructor(
+    private formBuilder: FormBuilder,
+    private deliveryApi: DeliveryApi
+  ) {
     this.routeForm = this.formBuilder.group({
       from: ['', Validators.required],
       to: ['', Validators.required],
@@ -98,6 +106,8 @@ export class Order implements AfterViewInit, OnDestroy {
     this.calculationResult.set(null);
 
     if (this.routeForm.invalid) {
+      this.routeForm.controls['from'].markAsTouched();
+      this.routeForm.controls['to'].markAsTouched();
       return;
     }
 
@@ -107,6 +117,7 @@ export class Order implements AfterViewInit, OnDestroy {
     }
 
     const { from, to, size, speed } = this.routeForm.getRawValue();
+    this.sidebarLoading.set(true);
 
     try {
       const request = {
@@ -141,6 +152,8 @@ export class Order implements AfterViewInit, OnDestroy {
       this.applyCalculation({ from, to, size, speed, distanceMeters });
     } catch {
       this.failedCalculation();
+    } finally {
+      this.sidebarLoading.set(false);
     }
   }
 
@@ -167,8 +180,44 @@ export class Order implements AfterViewInit, OnDestroy {
       createdAt: new Date().toISOString(),
     };
 
-    console.log(payload);
-    this.orderId.set(1);
+    this.sidebarLoading.set(true);
+    this.deliveryApi
+      .createDelivery(payload)
+      .pipe(finalize(() => this.sidebarLoading.set(false)))
+      .subscribe((response) => {
+        if ('error' in response) {
+          alert(response.error);
+          return;
+        }
+
+        this.orderId.set(response.id);
+      });
+  }
+
+  public resetOrderFlow(): void {
+    this.orderId.set(null);
+    this.calculationResult.set(null);
+    this.sidebarLoading.set(false);
+
+    this.routeForm.reset({
+      from: '',
+      to: '',
+      size: 'xs',
+      speed: 'regular',
+    });
+
+    this.orderForm.reset({
+      name: '',
+      phone: '',
+      comment: '',
+    });
+
+    this.clearRouteGraphics();
+
+    if (this.placesReady) {
+      this.detachAutocompleteListeners();
+      this.initPlaceAutocomplete();
+    }
   }
 
   private async initMapAndLibraries(): Promise<void> {
@@ -253,8 +302,18 @@ export class Order implements AfterViewInit, OnDestroy {
       await this.applySelectedPlace(event, 'to');
     };
 
+    this.fromBlurHandler = () => {
+      this.routeForm.controls['from'].markAsTouched();
+    };
+
+    this.toBlurHandler = () => {
+      this.routeForm.controls['to'].markAsTouched();
+    };
+
     this.fromAutocompleteElement.addEventListener('gmp-select', this.fromSelectHandler);
     this.toAutocompleteElement.addEventListener('gmp-select', this.toSelectHandler);
+    this.fromAutocompleteElement.addEventListener('blur', this.fromBlurHandler);
+    this.toAutocompleteElement.addEventListener('blur', this.toBlurHandler);
   }
 
   private async applySelectedPlace(event: any, field: RouteField): Promise<void> {
@@ -274,6 +333,7 @@ export class Order implements AfterViewInit, OnDestroy {
     }
 
     this.routeForm.controls[field].setValue(label);
+    this.routeForm.controls[field].markAsTouched();
   }
 
   private renderRoute(route: any): void {
@@ -305,13 +365,21 @@ export class Order implements AfterViewInit, OnDestroy {
     if (this.fromAutocompleteElement && this.fromSelectHandler) {
       this.fromAutocompleteElement.removeEventListener('gmp-select', this.fromSelectHandler);
     }
+    if (this.fromAutocompleteElement && this.fromBlurHandler) {
+      this.fromAutocompleteElement.removeEventListener('blur', this.fromBlurHandler);
+    }
 
     if (this.toAutocompleteElement && this.toSelectHandler) {
       this.toAutocompleteElement.removeEventListener('gmp-select', this.toSelectHandler);
     }
+    if (this.toAutocompleteElement && this.toBlurHandler) {
+      this.toAutocompleteElement.removeEventListener('blur', this.toBlurHandler);
+    }
 
     this.fromSelectHandler = null;
     this.toSelectHandler = null;
+    this.fromBlurHandler = null;
+    this.toBlurHandler = null;
     this.fromAutocompleteElement = null;
     this.toAutocompleteElement = null;
   }

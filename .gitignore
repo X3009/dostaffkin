@@ -1,4 +1,5 @@
 __notes
+.env
 node_modules
 dist/
 tmp/
@@ -6,4 +7,3 @@ out-tsc/
 bazel-out/
 .angular/
 .cache/
-src/environments/environment.ts

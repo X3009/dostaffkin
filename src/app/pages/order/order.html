@@ -9,25 +9,47 @@
   </div>
 
   <div class="main-content">
-    <div class="main-route" [formGroup]="routeForm">
+    <div class="main-route" [formGroup]="routeForm" [class.is-locked]="orderId()">
       <div class="main-block-title">Маршрут</div>
 
       <div class="main-fields">
-        <div class="main-field" id="fromField">
+        <div
+          class="main-field"
+          id="fromField"
+          [class.is-invalid]="
+            this.routeForm.get('from')?.invalid &&
+            (this.routeForm.get('from')?.dirty || this.routeForm.get('from')?.touched)
+          "
+        >
           <div class="main-pin"></div>
           <div id="fromAutocompleteHost" class="main-google-ac"></div>
           <input type="hidden" formControlName="from" />
         </div>
+        @if (this.routeForm.get('from')?.invalid && (this.routeForm.get('from')?.dirty ||
+        this.routeForm.get('from')?.touched)) {
+        <label for="from" class="input-error">Заполните поле Откуда</label>
+        }
 
-        <div class="main-field" id="toField">
+        <div
+          class="main-field"
+          id="toField"
+          [class.is-invalid]="
+            this.routeForm.get('to')?.invalid &&
+            (this.routeForm.get('to')?.dirty || this.routeForm.get('to')?.touched)
+          "
+        >
           <div class="main-pin"></div>
           <div id="toAutocompleteHost" class="main-google-ac"></div>
           <input type="hidden" formControlName="to" />
         </div>
+        @if (this.routeForm.get('to')?.invalid && (this.routeForm.get('to')?.dirty ||
+        this.routeForm.get('to')?.touched)) {
+        <label for="from" class="input-error">Заполните поле Куда</label>
+        }
       </div>
     </div>
 
-    <div class="main-package">
+    <div class="main-package" [style.display]="orderId() ? 'none' : null">
       <div class="main-block-title">Размер посылки</div>
 
       <div class="main-sizes">
@@ -53,7 +75,7 @@
       </div>
     </div>
 
-    <div class="main-speed">
+    <div class="main-speed" [style.display]="orderId() ? 'none' : null">
       <div class="main-block-title">Скорость доставки</div>
 
       <div class="main-speeds">
@@ -70,12 +92,12 @@
       </div>
     </div>
 
-    <div class="main-calculate-block">
+    <div class="main-calculate-block" [style.display]="orderId() ? 'none' : null">
       <button
         id="calc"
         class="button calculate-button"
         type="button"
-        [disabled]="routeForm.invalid"
+        [disabled]="routeForm.invalid || sidebarLoading()"
         (click)="calculate()"
       >
         Рассчитать
@@ -122,7 +144,7 @@
         class="main-order-form"
         id="orderForm"
         [formGroup]="orderForm"
-        [style.display]="orderId() ? 'none' : 'null'"
+        [style.display]="orderId() ? 'none' : null"
       >
         <div class="main-order-title">Оформление доставки</div>
 
@@ -148,6 +170,19 @@
                 inputmode="tel"
               />
             </div>
+
+            <div>
+              @if (this.orderForm.get('name')?.invalid && (this.orderForm.get('name')?.dirty ||
+              this.orderForm.get('name')?.touched)) {
+              <label for="customerName" class="input-error">Заполните имя</label>
+              }
+            </div>
+            <div>
+              @if (this.orderForm.get('phone')?.invalid && (this.orderForm.get('phone')?.dirty ||
+              this.orderForm.get('phone')?.touched)) {
+              <label for="customerPhone" class="input-error">Заполните телефон</label>
+              }
+            </div>
           </div>
         </div>
 
@@ -167,7 +202,7 @@
           id="submit"
           class="button main-submit-request"
           type="button"
-          [disabled]="!calculationResult() || orderForm.invalid"
+          [disabled]="!calculationResult() || orderForm.invalid || sidebarLoading()"
           (click)="submitOrder()"
         >
           Отправить заявку
@@ -181,7 +216,16 @@
           Номер отправления – <span id="orderId">{{orderId()}}</span>
         </div>
         <div class="main-success-subtitle">Мы скоро свяжемся с вами</div>
+        <button type="button" class="button main-success-reset" (click)="resetOrderFlow()">
+          Оформить новую заявку
+        </button>
       </div>
     </div>
   </div>
+
+  @if (sidebarLoading()) {
+  <div class="sidebar-loader-overlay" role="status" aria-live="polite" aria-label="Загрузка">
+    <div class="sidebar-loader"></div>
+  </div>
+  }
 </aside>
