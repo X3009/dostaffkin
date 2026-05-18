@@ -2,6 +2,8 @@ name: Autocheck 5 lesson
 
 on:
   push:
+    branches:
+      - main
   workflow_dispatch:
 
 jobs:
@@ -12,7 +14,7 @@ jobs:
       REFERENCE_REPO: intensive-front/l5ref
       # STRICT=true  -> максимально строго (кроме CRLF и BOM)
       # STRICT=false -> игнорировать пробелы в конце строк + пустые строки в конце файла
-      STRICT: "false"
+      STRICT: 'false'
 
     steps:
       - name: clone repo

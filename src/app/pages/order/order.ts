@@ -1,19 +1,14 @@
 import { UpperCasePipe } from '@angular/common';
 import { AfterViewInit, Component, OnDestroy, signal } from '@angular/core';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
+import { environment } from '../../../environments/environment';
 import { Header } from '../../header/header';
 import { DELIVERY_SIZES, DELIVERY_SPEEDS } from './order.config';
-
-interface GoogleEnv {
-  GOOGLE_MAPS_API_KEY?: string;
-}
-
 type RouteField = 'from' | 'to';
 
 declare global {
   interface Window {
     google?: any;
-    __env?: GoogleEnv;
     __googleMapsInit?: () => void;
     __googleMapsInitError?: () => void;
     gm_authFailure?: () => void;
@@ -63,8 +58,7 @@ export class Order implements AfterViewInit, OnDestroy {
       comment: [''],
     });
 
-    const env = window.__env;
-    this.mapApiKey = this.normalizeEnvValue(env?.GOOGLE_MAPS_API_KEY);
+    this.mapApiKey = this.normalizeEnvValue(environment.googleMapsApiKey);
   }
 
   public async ngAfterViewInit(): Promise<void> {
